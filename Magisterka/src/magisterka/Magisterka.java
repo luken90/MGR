@@ -71,8 +71,7 @@ public class Magisterka {
         finally{
             //finish the transaction
             transaction.finish();
-        }
-        
+        }    
     }
     void removeData(){
         Transaction transaction = graphDataService.beginTx();
@@ -95,4 +94,6 @@ public class Magisterka {
         graphDataService.shutdown();
         System.out.println("Wyłączono bazę");
     }
+    
+    //TODO
 }
