@@ -28,7 +28,7 @@ public class Magisterka {
     /**
      * @param args the command line arguments
      */
-    public String randomString(int len){
+    public static String randomString(int len){
         char[] str = new char[100];
 
         for (int i = 0; i < len; i++){
@@ -41,17 +41,42 @@ public class Magisterka {
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
         // TODO code application logic here
-        Neo4j hello = new Neo4j();
-        //hello.createDataBase();
-        //hello.removeData();
-        //hello.deleteCYPHER();
-        //hello.shutDown();
-        //hello.addCYPHER(2);
-        hello.showCYPHER();
-        //String a =hello.randomString(7);
-        //System.out.println((int)'A');
-        //Oracle ora = new Oracle();
-        //System.out.println(ora.zapiszKlientRekordy());
+        Neo4j neo4j = new Neo4j();
+        Oracle oracle = new Oracle();
+        int uzytkownicy=30;
+        for(int i=1 ; i <=uzytkownicy; i++){
+            String imie= randomString(16);
+            String nazwisko= randomString(16);
+            oracle.DodajRekordyPerson(i,imie, nazwisko);
+            neo4j.addNodeCYPHER(i,imie, nazwisko);
+        }
+        
+        
+        int relacje=100;
+        //int maks= 10;
+        for (int j=1; j <=relacje; j++){
+            int person = (int)(Math.random()*uzytkownicy+1);
+            int friend = (int)(Math.random()*uzytkownicy+1);
+            System.out.println("Osoba "+ person + ", przyjaciel "+ friend);
+            if (person != friend){
+                if (oracle.SprawdzRelacje(person, friend)){
+                    oracle.DodajRekordyFriends(person, friend);
+                    neo4j.addRelacionCYPHER(person, friend);
+                }
+                else{
+                    j--;
+                }
+            }
+            else{
+                j--;
+            }
+
+        }
+        //neo4j.showCYPHER();
+        //neo4j.deleteCYPHER();
+        neo4j.shutDown();
+        oracle.ZamknijPolaczenie();
+        
     }
 
 }
