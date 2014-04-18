@@ -43,25 +43,25 @@ public class Magisterka {
         // TODO code application logic here
         Neo4j neo4j = new Neo4j();
         Oracle oracle = new Oracle();
-        int uzytkownicy=30;
+        int uzytkownicy=10;       
         for(int i=1 ; i <=uzytkownicy; i++){
             String imie= randomString(16);
             String nazwisko= randomString(16);
             oracle.DodajRekordyPerson(i,imie, nazwisko);
-            neo4j.addNodeCYPHER(i,imie, nazwisko);
+            neo4j.createPerson(i, imie, nazwisko);
+            //neo4j.addNodeCYPHER(i,imie, nazwisko);
         }
-        
-        
-        int relacje=100;
-        //int maks= 10;
+        System.out.println("Relacje");
+        int relacje=5;
         for (int j=1; j <=relacje; j++){
             int person = (int)(Math.random()*uzytkownicy+1);
             int friend = (int)(Math.random()*uzytkownicy+1);
-            System.out.println("Osoba "+ person + ", przyjaciel "+ friend);
+            //System.out.println("Osoba "+ person + ", przyjaciel "+ friend);
             if (person != friend){
                 if (oracle.SprawdzRelacje(person, friend)){
                     oracle.DodajRekordyFriends(person, friend);
-                    neo4j.addRelacionCYPHER(person, friend);
+                    neo4j.createRelation(person, friend);
+                    //neo4j.addRelationCYPHER(person, friend);
                 }
                 else{
                     j--;

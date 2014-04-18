@@ -16,6 +16,8 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.index.Index;
+import org.neo4j.graphdb.index.IndexHits;
+import org.neo4j.graphdb.index.IndexManager;
 
 
 /**
@@ -25,24 +27,34 @@ import org.neo4j.graphdb.index.Index;
 public class Neo4j {
     private static final String Neo4J_DBPath = "C:/Users/Hp/Downloads/neo4j-community-2.1.0-M01-windows/neo4j-community-2.1.0-M01";
     
-    Node first;
-    Node second;
+    Node person;
+    Node friend;
+    Index<Node> personNIK;
     Relationship relation;
     GraphDatabaseService graphDataService;
     
     public Neo4j(){
         graphDataService = new GraphDatabaseFactory().newEmbeddedDatabase(Neo4J_DBPath);
-        //Index<Node> nodeIndex = graphDataService.index().forNodes("Person");
+
+        Transaction transaction = graphDataService.beginTx();
+        try{
+        IndexManager index = graphDataService.index();
+        personNIK = index.forNodes( "person" );
+                    transaction.success();
+        }
+        finally{
+            transaction.finish();
+        } 
+        
 
     }
     
     private static enum RelTypes implements RelationshipType{
-        KNOWS;
+        ZNA;
     }
 
     public void showCYPHER(){
 
-        //graphDataService = new GraphDatabaseFactory().newEmbeddedDatabase(Neo4J_DBPath);
         Transaction transaction = graphDataService.beginTx();
         ExecutionEngine engine = new ExecutionEngine(graphDataService);
         ExecutionResult result = engine.execute( "start n=node(*) return n");
@@ -53,115 +65,80 @@ public class Neo4j {
     }
     
     public void deleteCYPHER(){
-
-        //graphDataService = new GraphDatabaseFactory().newEmbeddedDatabase(Neo4J_DBPath);
         Transaction transaction = graphDataService.beginTx();
         try{
-        ExecutionEngine engine = new ExecutionEngine(graphDataService);
-        ExecutionResult result = engine.execute( "MATCH (n)\n" +
+            ExecutionEngine engine = new ExecutionEngine(graphDataService);
+            ExecutionResult result = engine.execute( "MATCH (n)\n" +
                                                     "OPTIONAL MATCH (n)-[r]-()\n" +
                                                     //"WHERE (ID(n)>2000 AND ID(n)<2010)\n"+
                                                     "DELETE n,r");
-        System.out.println(result.dumpToString());
+            System.out.println(result.dumpToString());
                     transaction.success();
         }
         finally{
             transaction.finish();
         }  
-        //ExecutionResult result = engine.execute("START n = node(*) OPTIONAL MATCH n-[r?]-() WHERE ID(n)>0 DELETE n, r");
-        
     }
     
     public void addNodeCYPHER(int i, String firstname, String lastname){
-
-        //graphDataService = new GraphDatabaseFactory().newEmbeddedDatabase(Neo4J_DBPath);
         Transaction transaction = graphDataService.beginTx();
         try{
             ExecutionEngine engine = new ExecutionEngine(graphDataService);
-
-
-//            WSTAWIANIE WIERZCHOŁKÓW POJEDYNCZO
-//            for(int i =0; i < prog; i++){
-//                int random = (int)(Math.random()*100);
-//                ExecutionResult result = engine.execute( "CREATE (a { name : '"+random+"' }) RETURN a");
-//            }
-
-
-//            WSTAWIANIE WIERZCHOŁKÓW PARAMI           
-//            for(int i =0; i < prog; i++){
-//                int random = (int)(Math.random()*100);
-//                int random2 = (int)(Math.random()*100);
-                ExecutionResult result = engine.execute( "CREATE (n:Person {NIK : '"+i+"', firstname : '"+firstname+"', lastname: '"+lastname+"' }) RETURN n");
-                //ExecutionResult result1 = engine.execute( "CREATE (a { name : '"+random2+"' }) RETURN a");
-                //ExecutionResult result = engine.execute( "CREATE (a { name : '"+random+"' }) RETURN a");
-                //ExecutionResult result1 = engine.execute( "CREATE (a { name : '"+random2+"' }) RETURN a");
-                /*ExecutionResult relacja = engine.execute("MATCH (a),(b)\n" +
-                                                        "WHERE a.name = '"+random+"' AND b.name = '"+random2+"'\n" +
-                                                        "CREATE (a)-[r:ZNA]->(b)\n" +
-                                                        "RETURN r");*/
-                
-//            }            
-            
-            
-            //System.out.println(result.dumpToString());
-                        transaction.success();
+            ExecutionResult result = engine.execute( "CREATE (n:Person {NIK : '"+i+"', firstname : '"+firstname+"', lastname: '"+lastname+"' }) RETURN n");
+            transaction.success();
         }
         finally{
             //finish the transaction
             transaction.finish();
-        }  
-        //shutDown();
-        //ExecutionResult result = engine.execute("START n = node(*) OPTIONAL MATCH n-[r?]-() WHERE ID(n)>0 DELETE n, r");
-        
+        }     
     }
-    public void addRelacionCYPHER(int person, int friend){
-
+    public void addRelationCYPHER(int person, int friend){
         Transaction transaction = graphDataService.beginTx();
         try{
             ExecutionEngine engine = new ExecutionEngine(graphDataService);
-                //"MATCH (Person { NIK:'14' }) RETURN Person"
-                //"MATCH (a),(b) WHERE a.NIK = '14' AND b.NIK = '15' return a,b"
-                ExecutionResult relacja = engine.execute("MATCH (person),(friend) WHERE person.NIK = '"+person+"' AND friend.NIK = '"+friend+"'\n"+
+            ExecutionResult relacja = engine.execute("MATCH (person),(friend) WHERE person.NIK = '"+person+"' AND friend.NIK = '"+friend+"'\n"+
                                                         "CREATE (person)-[r:ZNA]->(friend)");
-                /*ExecutionResult relacja = engine.execute("MATCH (a),(b)\n" +
-                                                        "WHERE a.name = '"+random+"' AND b.name = '"+random2+"'\n" +
-                                                        "CREATE (a)-[r:ZNA]->(b)\n" +
-                                                        "RETURN r");*/
-                
-//            }            
-            
-            
-            //System.out.println(result.dumpToString());
-                        transaction.success();
+            transaction.success();
         }
         finally{
             //finish the transaction
             transaction.finish();
         }  
-        //shutDown();
-        //ExecutionResult result = engine.execute("START n = node(*) OPTIONAL MATCH n-[r?]-() WHERE ID(n)>0 DELETE n, r");
-        
     }
 
     
-    public void createDataBase(){
-        //GraphDatabaseService
-        //graphDataService = new GraphDatabaseFactory().newEmbeddedDatabase(Neo4J_DBPath);
-        //BeginTransaction
+    public void createPerson(int i, String firstname, String lastname){
         Transaction transaction = graphDataService.beginTx();
         try{
             //Create Body & set the properties 
-            first = graphDataService.createNode();
-            first.setProperty("name", "jan");
+            person = graphDataService.createNode();
+            person.setProperty("firstname", firstname);
+            person.setProperty("lastname",lastname);
+            person.setProperty("NIK",i);
+            personNIK.add(person, "NIK", person.getProperty("NIK"));
             
-            second = graphDataService.createNode();
-            second.setProperty("name", "nowak");
-            //Relationship
-            relation = first.createRelationshipTo(second, RelTypes.KNOWS);
-            relation.setProperty("relationship-type", "Dane");
-            System.out.println(first.getProperty("name").toString());
-            System.out.println(relation.getProperty("relationship-type").toString());
-            System.out.println(second.getProperty("name").toString());
+            //Succes transaction
+            transaction.success();
+        }
+        finally{
+            //finish the transaction
+            transaction.finish();
+        }    
+    }
+    public void createRelation(int person1, int friend1){
+        Transaction transaction = graphDataService.beginTx();
+        try{
+            System.out.println("Osoba "+ person1+ ", przyjaciel "+friend1);
+            IndexHits<Node> hits = personNIK.get( "NIK", person1 );
+            Node o1 = hits.getSingle();
+            IndexHits<Node> hits1 = personNIK.get( "NIK", friend1 );
+            Node o2 = hits1.getSingle();
+            System.out.println(o2.getProperty("NIK"));
+            relation = o1.createRelationshipTo(o2, RelTypes.ZNA);
+            relation.setProperty("relationship-type", "Znajomi");
+//            System.out.println(first.getProperty("name").toString());
+//            System.out.println(relation.getProperty("relationship-type").toString());
+//            System.out.println(second.getProperty("name").toString());
             
             //Succes transaction
             transaction.success();
@@ -176,11 +153,11 @@ public class Neo4j {
         Transaction transaction = graphDataService.beginTx();
         try{
             //delete
-            first.getSingleRelationship(RelTypes.KNOWS, Direction.OUTGOING).delete();
+            person.getSingleRelationship(RelTypes.ZNA, Direction.OUTGOING).delete();
             System.out.println("Usunięto węzły");
             //delete nodes
-            first.delete();
-            second.delete();
+            person.delete();
+            friend.delete();
             transaction.success();
         }
         finally{
