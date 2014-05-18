@@ -50,7 +50,8 @@ public class Neo4j {
     }
     
     private static enum RelTypes implements RelationshipType{
-        ZNA;
+        ZNA;//, NALEZY, MA_KATEGORIE, LUBI;
+        
     }
 
     public void showCYPHER(){
@@ -128,12 +129,12 @@ public class Neo4j {
     public void createRelation(int person1, int friend1){
         Transaction transaction = graphDataService.beginTx();
         try{
-            System.out.println("Osoba "+ person1+ ", przyjaciel "+friend1);
+            //System.out.println("Osoba "+ person1+ ", przyjaciel "+friend1);
             IndexHits<Node> hits = personNIK.get( "NIK", person1 );
             Node o1 = hits.getSingle();
             IndexHits<Node> hits1 = personNIK.get( "NIK", friend1 );
             Node o2 = hits1.getSingle();
-            System.out.println(o2.getProperty("NIK"));
+            //System.out.println(o2.getProperty("NIK"));
             relation = o1.createRelationshipTo(o2, RelTypes.ZNA);
             relation.setProperty("relationship-type", "Znajomi");
 //            System.out.println(first.getProperty("name").toString());

@@ -43,16 +43,16 @@ public class Magisterka {
         // TODO code application logic here
         Neo4j neo4j = new Neo4j();
         Oracle oracle = new Oracle();
-        int uzytkownicy=10;       
-        for(int i=1 ; i <=uzytkownicy; i++){
-            String imie= randomString(16);
-            String nazwisko= randomString(16);
-            oracle.DodajRekordyPerson(i,imie, nazwisko);
-            neo4j.createPerson(i, imie, nazwisko);
-            //neo4j.addNodeCYPHER(i,imie, nazwisko);
-        }
+        int uzytkownicy=60000;       
+//        for(int i=50001 ; i <=uzytkownicy; i++){
+//            String imie= randomString(16);
+//            String nazwisko= randomString(16);
+//            oracle.DodajRekordyPerson(i,imie, nazwisko);
+//            neo4j.createPerson(i, imie, nazwisko);
+//            //neo4j.addNodeCYPHER(i,imie, nazwisko);
+//        }
         System.out.println("Relacje");
-        int relacje=5;
+        int relacje=5000;
         for (int j=1; j <=relacje; j++){
             int person = (int)(Math.random()*uzytkownicy+1);
             int friend = (int)(Math.random()*uzytkownicy+1);
